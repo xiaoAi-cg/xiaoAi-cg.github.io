@@ -1,2 +1,2 @@
 # xiaoAi-cg.github.io
-github io
+This is my github page.
