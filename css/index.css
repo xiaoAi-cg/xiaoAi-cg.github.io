@@ -2,4 +2,61 @@ body {
 	margin: 0px;
 	background-color: #FFFFFF;
 	overflow: hidden;
+	padding: 0;
+}
+	
+.AXF-container{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #dbcbcc;
+	text-align: center;
+}
+.AXF-content{
+	width: 100%;
+	height: 90%;
+}
+.AXF-content-avatar{
+	position: absolute;
+	right: 0px;
+	height: 100vh;
+	width: 100vh;
+	background-image: url(../images/IMG_1042-1.jpg);
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+.AXF-content-text{
+	position: absolute;
+	width: 60%;
+	height: auto;
+	margin-top: 20%;
+}
+.AXF-content-text h1{
+	font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+	font-weight: 300;
+    font-style: normal;
+	color: white;
+	font-size: 5rem;
+	line-height: 6rem;
+}
+.AXF-content-text span{
+	border-radius: 0.625rem;
+	background-color: red;
+	padding: 0.3rem 0.625rem;
+}
+.AXF-content-button{
+	position: absolute;
+	width: 16vw;
+	height: auto;
+	bottom: 38vh;
+	text-align: left;
+	margin-left: 3vw;
+}
+.AXF-footer{
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 5%;
+	text-align: center;
+	color: white;
 }
