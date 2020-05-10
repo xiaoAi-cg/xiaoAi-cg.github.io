@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang = "zh">
 	<head>
-		<title>X.AI DE Page</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>【X.AI】 の Website</title>
+		<meta http-equiv="Conent-Type" content="text/html; charset=UTF-8">
     	<meta charset="utf-8">
     	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     	<style>
@@ -62,14 +62,14 @@
 	      import { GeometryUtils } from './THREE111DEV/examples/jsm/utils/GeometryUtils.js';
 
 
-	      var roomSize = new THREE.Vector3(3, 3, 3);
-	      var textScale = 0.3;
+	      var textScale = 0.4;
 
 	      var container, canvas, gl;
 
 	      var scene, camera, light, renderer;
+
 	      var geometry, geometry2, originGeometry, cube, mesh, material;
-	      var roomMesh;
+
 	      var projector = new Projector();
 
 	      var data, texture, points;
@@ -89,7 +89,7 @@
 
 	      var pickCoord = new THREE.Vector3(0.0, 0.0, 0.0);
 	      var pickRay = new THREE.Ray();
-	      var clickPlane = new THREE.Plane(new THREE.Vector3(0.0, 0.0, 1.0), roomSize.z*0.25);
+	      var clickPlane = new THREE.Plane(new THREE.Vector3(0.0, 0.0, 1.0), 0.75);
 
 	      var mouseCoordQueue = [];
 
@@ -162,17 +162,25 @@
 
 	        scene = new THREE.Scene();
 
-	        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, roomSize.z * 10 );
-	        camera.position.y = (roomSize.y/2);
+	        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 30 );
+	        camera.position.y = 1.5;
 
-	        camera.position.z = roomSize.z*0.2;
-
-	        camera.lookAt( new THREE.Vector3(0, roomSize.y/2, -roomSize.z*0.25));
+	        camera.position.z = 0.6;
 
 	        scene.add( camera );
 
+	        controller1 = renderer.vr.getController( 0 );
+	        scene.add( controller1 );
 
+	        controller2 = renderer.vr.getController( 1 );
+	        scene.add( controller2 );
 
+	        var controllerMaterial = new THREE.MeshPhongMaterial({ color: 0x00DD22 });
+	        var controllerGeometry = new THREE.IcosahedronGeometry(CONTROLLER_COLLIDER_SIZE, 1);
+	        controllerMesh1 = new THREE.Mesh(controllerGeometry, controllerMaterial);
+	        controllerMesh2 = new THREE.Mesh(controllerGeometry, controllerMaterial);
+	        controller1.add( controllerMesh1 );
+	        controller2.add( controllerMesh2 );
 
 	        var fingerMaterial = new THREE.MeshPhongMaterial({ color: 0x00DD22 });
 	        var fingerGeometry = new THREE.IcosahedronGeometry(1, 2);
@@ -258,8 +266,8 @@
 	            simulationShader.setColliders(colliders);
 
 	            mesh = new THREE.Points(geometry, material);
-	            mesh.position.z = -roomSize.z*0.25;
-	            mesh.position.y = roomSize.y/2;
+	            mesh.position.z = -0.75;
+	            mesh.position.y = 1.5;
 	            // Should probably be linked to the room size somehow.
 	            mesh.scale.set(textScale, textScale, textScale); 
 	            scene.add(mesh);
@@ -447,7 +455,7 @@
 	      var remainder = 0;
 	      function render(t) {
 	        if (isWebGL2 && mesh) {
-	          //updateColliders();
+	          updateColliders();
 
 	          var lastTime = simulationShader.getTime(t);
 	          if (t - lastTime > fixedStep * 5) {
