@@ -21,12 +21,58 @@
 			import {OBJLoader} from '../../THREE116/examples/jsm/loaders/OBJLoader.js';
 			
 			var camera, renderer, scene;
-			
+			var materialL, materialR;
+			var sourceObj;
+			var meshL, meshR;
 			
 			init();
 			
-			animate();
-
+			function loadResources(){
+				var manager = new THREE.LoadingManager();
+				
+				manager.onProgress = function(item, loaded, total) {		
+					console.log(item, loaded, total);		
+				};
+				
+				manager.onLoad = function(){
+					
+					// resources already loaded
+					
+					meshL = sourceObj.clone();
+					meshR = sourceObj.clone();
+					
+					meshL.material = materialL;
+					meshR.material = materialR;
+					
+					meshL.layers.set(1);
+					meshR.layers.set(2);
+					
+					scene.add(meshL);
+					scene.add(meshR);
+					
+					animate();
+				};
+				
+				manager.onError = function(url){
+					console.log( 'There was an error loading ' + url );
+				}
+				
+				var textureLoader = new THREE.TextureLoader(manager);
+				var objLoader = new OBJLoader(manager);
+				
+				textureLoader.load("../resources/textures/Map_v1_step1_28_1Right.jpg",function(texture){
+					materialL = new THREE.MeshBasicMaterial({map:texture});
+				});
+				
+				textureLoader.load("../resources/textures/Map_v1_step1_28_1Left.jpg",function(texture){
+					materialR = new THREE.MeshBasicMaterial({map:texture});
+				});
+				
+				objLoader.load('../resources/models/dualcylinder.obj',function(obj){
+					sourceObj = obj.children[0];
+				});
+			}
+			
 			function init() {
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -43,39 +89,8 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.layers.enable( 1 );
-				
-				
-				// material
-				var materialL, materialR;
-				
-				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load('../resources/textures/Map_v1_step1_28_1Right.jpg',function(texture){
-					materialL = new THREE.MeshBasicMaterial({map:texture});
-				});
-				textureLoader.load('../resources/textures/Map_v1_step1_28_1Left.jpg',function(texture){
-					materialR = new THREE.MeshBasicMaterial({map:texture});
-				});
-				
-				
-				// model
-				var meshL, meshR;
-				var loader = new OBJLoader();
 
-				loader.load('../resources/models/dualcylinder.obj',function(obj){
-					meshL = obj.children[0].clone();
-					meshR = obj.children[0].clone();
-					
-					meshL.material = materialL;
-					meshR.material = materialR;
-					
-					meshL.layers.set(1);
-					meshR.layers.set(2);
-					
-					scene.add(meshL);
-					scene.add(meshR);
-					
-					//console.log(scene);
-				});
+				loadResources();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
