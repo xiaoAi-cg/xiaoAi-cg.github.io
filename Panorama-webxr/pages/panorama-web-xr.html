@@ -39,7 +39,11 @@
 					// resources already loaded
 					
 					meshL = sourceObj.clone();
+					
 					meshR = sourceObj.clone();
+					var radians = new THREE.Euler(0,0.2,0,'XYZ');
+					meshR.setRotationFromEuler(radians);
+					
 					
 					meshL.material = materialL;
 					meshR.material = materialR;
@@ -60,11 +64,11 @@
 				var textureLoader = new THREE.TextureLoader(manager);
 				var objLoader = new OBJLoader(manager);
 				
-				textureLoader.load("../resources/textures/Map_v1_step1_28_3Right.jpg",function(texture){
+				textureLoader.load("../resources/textures/Map_v1_step1_28_1Left.jpg",function(texture){
 					materialL = new THREE.MeshBasicMaterial({map:texture});
 				});
 				
-				textureLoader.load("../resources/textures/Map_v1_step1_28_3Left.jpg",function(texture){
+				textureLoader.load("../resources/textures/Map_v1_step1_28_1Right.jpg",function(texture){
 					materialR = new THREE.MeshBasicMaterial({map:texture});
 				});
 				
