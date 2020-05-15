@@ -41,7 +41,9 @@
 					meshL = sourceObj.clone();
 					
 					meshR = sourceObj.clone();
-					var radians = new THREE.Euler(0,0.2,0,'XYZ');
+					
+					// 旋转方向为逆时针
+					var radians = new THREE.Euler(0,0.97,0,'XYZ');
 					meshR.setRotationFromEuler(radians);
 					
 					
@@ -64,11 +66,11 @@
 				var textureLoader = new THREE.TextureLoader(manager);
 				var objLoader = new OBJLoader(manager);
 				
-				textureLoader.load("../resources/textures/Map_v1_step1_28_1Left.jpg",function(texture){
+				textureLoader.load("../resources/textures/Map_v1_step1_Left.jpg",function(texture){
 					materialL = new THREE.MeshBasicMaterial({map:texture});
 				});
 				
-				textureLoader.load("../resources/textures/Map_v1_step1_28_1Right.jpg",function(texture){
+				textureLoader.load("../resources/textures/Map_v1_step1_Right.jpg",function(texture){
 					materialR = new THREE.MeshBasicMaterial({map:texture});
 				});
 				

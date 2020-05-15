@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+		<title>Dynamic Panorama</title>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+	<body>
+		<!-- <script src="../../THREE116/examples/js/HelioWebXRPolyfill.js"></script> -->
+		<script type="module">
+			// three.js revision 116
+			// 启用webXR的几个步骤
+			// 1. import VRButton
+			// 2. document.body.appendChild( VRButton.createButton( renderer ) )
+			// 3. renderer.xr.enabled = true
+			// 4. 使用serAnimationLoop 代替 window.requestAnimationFrame
+			
+			import * as THREE from '../../../THREE116/build/three.module.js';
+			import {VRButton} from '../../../THREE116/examples/jsm/webxr/VRButton.js';
+			
+			var camera, renderer, scene;
+			var materialL, materialR;
+			var meshL, meshR;
+			var imageNums = 16;
+			var textures = [];
+			var xrCamera;
+			
+			var text;
+			
+			init();
+			
+			function loadResources(){
+				var manager = new THREE.LoadingManager();
+				
+				manager.onProgress = function(item, loaded, total) {		
+					console.log(item, loaded, total);		
+				};
+				
+				manager.onLoad = function(){
+					
+					// resources already loaded
+					var geometry = new THREE.SphereBufferGeometry( 32.5, 128, 128 );
+					geometry.scale( - 1, 1, 1 );
+					geometry.rotateY(Math.PI / 2);
+					
+					materialL = new THREE.MeshBasicMaterial({map: textures[4]});
+					materialR = new THREE.MeshBasicMaterial({map: textures[12]});
+					
+					meshL = new THREE.Mesh( geometry, materialL );
+					meshR = new THREE.Mesh( geometry, materialR );
+		
+					meshL.layers.set(1);
+					meshR.layers.set(2);
+					
+					scene.add(meshL);
+					scene.add(meshR);
+					
+					animate();
+				};
+				
+				manager.onError = function(url){
+					console.log( 'There was an error loading ' + url );
+				}
+				
+				var textureLoader = new THREE.TextureLoader(manager);
+				
+				for(var i = 0; i < imageNums; i++){
+					var texture = textureLoader.load("../resources/textures/Dynamic_House/" + i + ".jpg");
+					textures.push(texture);
+				}
+			}
+			
+			var oldMainDir = 4;
+			
+			function updatePanorama(){
+				
+				var rotation = new THREE.Euler();
+				rotation.setFromRotationMatrix(camera.matrixWorld);
+				
+				// 将旋转空间映射为0-2PI
+				var theta = 0.0;
+				
+				if(rotation.y >= 0){
+					if(Math.abs(rotation.x)  >= Math.PI /2){
+						//第一象限
+						theta = rotation.y;
+					}else{
+						//第二象限
+						theta = Math.PI - rotation.y
+					}
+				}else{
+					if(Math.abs(rotation.x)  <= Math.PI /2){
+						//第三象限
+						theta = Math.PI - rotation.y;
+					}else{
+						//第四象限
+						theta = Math.PI * 2 + rotation.y;
+					}
+				}
+				
+				//text.innerText = theta;
+				
+				// 将0-2PI空间划分为imageNums份
+				var mainDir = Math.round(imageNums * theta / Math.PI / 2);
+				
+				//var mid = imageNums / 2;
+				
+				//var left = mainDir - mid / 2;
+				//var right = mainDir - mid / 2;
+				if(mainDir != oldMainDir){
+					var halfMid = imageNums / 4;
+					
+					var left = mainDir - halfMid;
+					if(left < 0){
+						left = imageNums + left;
+					}
+					var right = mainDir + halfMid;
+					if(right >= imageNums){
+						right = right % imageNums;
+					}
+					
+					materialL.map = textures[left];
+					materialR.map = textures[right];
+					//text.innerText = left + " " + mainDir +" "+right;
+					
+					oldMainDir = mainDir;
+				}
+			}
+			
+			function init() {
+				text = document.getElementById("ros");
+				
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+				
+				document.body.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.layers.enable( 1 );
+
+				loadResources();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				
+				renderer.setAnimationLoop( render );
+				
+			}
+
+			function render() {
+				
+				updatePanorama();
+				renderer.render( scene, camera );
+
+			}
+		</script>
+		<div id = "ros" style="position: fixed; font-size: 2.25rem;"></div>
+	</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+		<title>Circular Projection Panorama</title>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+	<body>
+		<!-- <script src="../../THREE116/examples/js/HelioWebXRPolyfill.js"></script> -->
+		<script type="module">
+			// three.js revision 116
+			// 启用webXR的几个步骤
+			// 1. import VRButton
+			// 2. document.body.appendChild( VRButton.createButton( renderer ) )
+			// 3. renderer.xr.enabled = true
+			// 4. 使用serAnimationLoop 代替 window.requestAnimationFrame
+			
+			import * as THREE from '../../../THREE116/build/three.module.js';
+			import {VRButton} from '../../../THREE116/examples/jsm/webxr/VRButton.js';
+			
+			var camera, renderer, scene;
+			var materialL, materialR;
+			var meshL, meshR;
+			
+			init();
+			
+			function loadResources(){
+				var manager = new THREE.LoadingManager();
+				
+				manager.onProgress = function(item, loaded, total) {		
+					console.log(item, loaded, total);		
+				};
+				
+				manager.onLoad = function(){
+					
+					// resources already loaded
+					var geometry = new THREE.CylinderBufferGeometry( 25.8, 25.8, 20.48, 256, 1, true );
+					geometry.scale( - 1, 1, 1 );
+					
+					meshL =  new THREE.Mesh( geometry, materialL );
+					meshR =  new THREE.Mesh( geometry, materialR );
+					// 旋转方向为逆时针
+					var radians = new THREE.Euler(0,0.469,0,'XYZ');
+					meshR.setRotationFromEuler(radians);
+					
+					meshL.layers.set(1);
+					meshR.layers.set(2);
+					
+					scene.add(meshL);
+					scene.add(meshR);
+					
+					animate();
+				};
+				
+				manager.onError = function(url){
+					console.log( 'There was an error loading ' + url );
+				}
+				
+				var textureLoader = new THREE.TextureLoader(manager);
+				
+				textureLoader.load("../resources/textures/circularProjection_House/left.jpg",function(texture){
+					materialL = new THREE.MeshBasicMaterial({map:texture});
+				});
+				
+				textureLoader.load("../resources/textures/circularProjection_House/right.jpg",function(texture){
+					materialR = new THREE.MeshBasicMaterial({map:texture});
+				});
+			}
+			
+			function init() {
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+				document.body.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.layers.enable( 1 );
+
+				loadResources();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+		</script>
+	</body>
+</html>
