@@ -61,11 +61,13 @@
 				
 				var textureLoader = new THREE.TextureLoader(manager);
 				
-				textureLoader.load("../resources/textures/House_simple_stereo/left.jpg",function(texture){
+				//  双目全景元左右眼全景图需要重新渲染
+				
+				textureLoader.load("../resources/textures/House_simple_stereo/0.jpg",function(texture){
 					materialL = new THREE.MeshBasicMaterial({map:texture});
 				});
 				
-				textureLoader.load("../resources/textures/House_simple_stereo/right.jpg",function(texture){
+				textureLoader.load("../resources/textures/House_simple_stereo/8.jpg",function(texture){
 					materialR = new THREE.MeshBasicMaterial({map:texture});
 				});
 			}
